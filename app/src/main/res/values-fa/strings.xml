@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">تست زبان</string>
+    <string name="english">انگلیسی</string>
+
+    <string name="hello">سلام\n%s</string>
+
+    <string name="settings_label">تنظیمات</string>
+
+    <string name="activity_1_label">صفحه ۱</string>
+    <string name="activity_2_label">صفحه ۲</string>
+    <string name="activity_1_text">متن تصادفی ۱</string>
+    <string name="activity_2_text">متن تصادفی ۲</string>
+    <string name="start_service">شروع یک سرویس</string>
+    <string name="farsi">فارسی</string>
+</resources>
