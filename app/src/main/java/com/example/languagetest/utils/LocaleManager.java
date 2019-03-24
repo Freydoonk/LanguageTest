@@ -1,31 +1,53 @@
 package com.example.languagetest.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import java.util.Locale;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR1;
+import static android.os.Build.VERSION_CODES.N;
 
 public class LocaleManager
 {
+	public static final String LANGUAGE_FARSI = "fa";
+	public static final String LANGUAGE_ENGLISH = "en";
+	private static final String LANGUAGE_KEY = "language_key";
 
-	private static final String LANGUAGE_FARSI = "fa";
+	private final SharedPreferences prefs;
 
-	public LocaleManager()
-	{}
+	public LocaleManager(Context context)
+	{
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	}
 
 	public Context setLocale(Context c)
 	{
 		return updateResources(c, getLanguage());
 	}
 
-
-	private String getLanguage()
+	public Context setNewLocale(Context c, String language)
 	{
-		return LANGUAGE_FARSI;
+		persistLanguage(language);
+		return updateResources(c, language);
+	}
+
+	public String getLanguage()
+	{
+		return prefs.getString(LANGUAGE_KEY, LANGUAGE_ENGLISH);
+	}
+
+	@SuppressLint("ApplySharedPref")
+	private void persistLanguage(String language)
+	{
+		// use commit() instead of apply(), because sometimes we kill the application process immediately
+		// which will prevent apply() to finish
+		prefs.edit().putString(LANGUAGE_KEY, language).commit();
 	}
 
 	private Context updateResources(Context context, String language)
@@ -35,7 +57,7 @@ public class LocaleManager
 
 		Resources res = context.getResources();
 		Configuration config = new Configuration(res.getConfiguration());
-		if (Build.VERSION.SDK_INT  >= JELLY_BEAN_MR1)
+		if (Build.VERSION.SDK_INT >=JELLY_BEAN_MR1)
 		{
 			config.setLocale(locale);
 			context = context.createConfigurationContext(config);
@@ -46,5 +68,11 @@ public class LocaleManager
 			res.updateConfiguration(config, res.getDisplayMetrics());
 		}
 		return context;
+	}
+
+	public static Locale getLocale(Resources res)
+	{
+		Configuration config = res.getConfiguration();
+		return Build.VERSION.SDK_INT >=N ? config.getLocales().get(0) : config.locale;
 	}
 }

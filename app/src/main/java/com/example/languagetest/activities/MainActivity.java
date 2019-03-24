@@ -1,27 +1,32 @@
 package com.example.languagetest.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.languagetest.App;
 import com.example.languagetest.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import static com.example.languagetest.utils.LocaleManager.LANGUAGE_ENGLISH;
+import static com.example.languagetest.utils.LocaleManager.LANGUAGE_FARSI;
+
 public class MainActivity extends AppCompatActivityBase implements NavigationView.OnNavigationItemSelectedListener
 {
-
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	protected void onCreate(@Nullable Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -29,14 +34,7 @@ public class MainActivity extends AppCompatActivityBase implements NavigationVie
 		setSupportActionBar(toolbar);
 
 		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-			}
-		});
+		fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show());
 
 		DrawerLayout drawer = findViewById(R.id.drawer_layout);
 		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.english, R.string.farsi);
@@ -48,6 +46,29 @@ public class MainActivity extends AppCompatActivityBase implements NavigationVie
 
 		TextView txtHello = findViewById(R.id.txtHello);
 		txtHello.setText(R.string.app_name);
+
+		findViewById(R.id.btnFarsi).setOnClickListener(v -> setNewLocale(LANGUAGE_FARSI, false));
+		findViewById(R.id.btnFarsi).setOnLongClickListener(v -> setNewLocale(LANGUAGE_FARSI, true));
+		findViewById(R.id.btnEnglish).setOnClickListener(v -> setNewLocale(LANGUAGE_ENGLISH, false));
+		findViewById(R.id.btnEnglish).setOnLongClickListener(v -> setNewLocale(LANGUAGE_ENGLISH, true));
+	}
+
+	private boolean setNewLocale(String language, boolean restartProcess)
+	{
+		App.localeManager.setNewLocale(this, language);
+
+		Intent i = new Intent(this, MainActivity.class);
+		startActivity(i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+
+		if (restartProcess)
+		{
+			System.exit(0);
+		}
+		else
+		{
+			Toast.makeText(this, "Activity restarted", Toast.LENGTH_LONG).show();
+		}
+		return true;
 	}
 
 	@Override
